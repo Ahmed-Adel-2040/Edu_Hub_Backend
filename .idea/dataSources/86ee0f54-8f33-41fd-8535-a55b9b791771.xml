@@ -1718,13 +1718,13 @@ model</ColNames>
       <DataType>tinyint(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="462" parent="306" name="teacher_Account_id">
+    <column id="462" parent="306" name="teacher_id">
       <Position>5</Position>
       <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <index id="463" parent="306" name="teacher_Account_id">
-      <ColNames>teacher_Account_id</ColNames>
+      <ColNames>teacher_id</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
@@ -1734,11 +1734,11 @@ model</ColNames>
       <Primary>1</Primary>
     </key>
     <key id="465" parent="306" name="teacher_Account_id">
-      <ColNames>teacher_Account_id</ColNames>
+      <ColNames>teacher_id</ColNames>
       <UnderlyingIndexName>teacher_Account_id</UnderlyingIndexName>
     </key>
     <foreign-key id="466" parent="306" name="Exam_teacher_teacher_Account_id_e30bd992_fk_auth_user_id">
-      <ColNames>teacher_Account_id</ColNames>
+      <ColNames>teacher_id</ColNames>
       <RefTableName>auth_user</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>

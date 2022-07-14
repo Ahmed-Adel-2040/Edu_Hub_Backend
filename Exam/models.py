@@ -15,7 +15,7 @@ class Exam (models.Model):
     type = models.CharField(max_length=50, null=False)
     level = models.PositiveIntegerField(max_length=2, null=False)
     name = models.CharField(max_length=60, unique=True)
-    teacher = models.ForeignKey(Teacher,related_name="+",on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User,related_name="+",on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     final_grade = models.PositiveIntegerField(max_length=2, default=10)
     examCategory=models.ForeignKey(ExamCategory,related_name='+',on_delete=models.CASCADE)

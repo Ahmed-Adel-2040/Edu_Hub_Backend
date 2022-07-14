@@ -57,7 +57,6 @@ class ExamViews():
                         "data": ""}
             return Response(dataJson)
 
-
     @api_view(["Get"])
     def getExamByCategoryAndName(self,Category,name):
         data = []
@@ -99,3 +98,43 @@ class ExamViews():
                         "data": ""}
             return Response(dataJson)
 
+    @api_view(["GET"])
+    def getExamAnswers(self,Category,name):
+        data = []
+        error = "No Error"
+        dataJson = {}
+        status = 200
+        try:
+            CategoryList = ExamCategory.objects.filter(categoryName=Category)
+            AllExam = Exam.objects.filter(examCategory_id=CategoryList.first().id)
+
+            AllExam = list(AllExam)
+            flage = 0
+            examObject = {}
+            for exam in AllExam:
+                if exam.name == name:
+                    examObject["type"] = exam.type
+                    examObject["finalGrade"] = exam.final_grade
+                    Questions = serializers.serialize('json', Question.objects.filter(exam_id=exam.id),
+                                                      fields=('question',"correctAnswer",))
+                    examObject["Questions"] = Questions
+                    flage = 1
+                    print(Questions)
+            if flage == 0:
+                Response.status_code = 404
+                raise Exception("this exam name not found")
+
+            if str(Response.status_code).startswith("4"):
+                error = 'it is the user input  error  ' + Response.status_text
+
+            dataJson = {"status": Response.status_code,
+                        "error": error,
+                        "data": examObject}
+            return Response(dataJson)
+        except Exception as e:
+
+            error = str(e)
+            dataJson = {"status": Response.status_code,
+                        "error": error,
+                        "data": ""}
+            return Response(dataJson)
