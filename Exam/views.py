@@ -2,6 +2,7 @@ from .serializer import *
 from rest_framework.response import Response
 from rest_framework.decorators import  api_view
 from django.core import serializers
+
 # Create your views here.
 
 class ExamViews():
@@ -28,51 +29,73 @@ class ExamViews():
     @api_view(["Get"])
     def getExamByCategory(self,Category):
         #CategoryObject=get_object_or_404(ExamCategory,categoryName=Category)
-        CategoryList = ExamCategory.objects.filter(categoryName=Category)
-        AllExam=Exam.objects.filter(examCategory_id=CategoryList.first().id)
-        AllExam = list(AllExam)
         data = []
         error = "No Error"
-        if str(Response.status_code).startswith("5"):
-            error = 'it is the internal server error  ' + Response.status_text
-        elif str(Response.status_code).startswith("4"):
-            error = 'it is the user input  error  ' + Response.status_text
+        status=200
+        dataJson={}
+        try:
+            CategoryList = ExamCategory.objects.filter(categoryName=Category)
+            AllExam=Exam.objects.filter(examCategory_id=CategoryList.first().id)
+            AllExam = list(AllExam)
+            if len(AllExam)==0:
+                status=404
+                raise Exception("this Category not found ")
 
-        for element in AllExam:
-            data.append(element.name)
+            if str(Response.status_code).startswith("5"):
+                error = 'it is the internal server error  ' + Response.status_text
 
-        dataJson = {"status": Response.status_code,
-                    "error": error,
-                    "data": data}
-        return Response(dataJson)
+            for element in AllExam:
+                data.append(element.name)
+
+            dataJson = {"status": Response.status_code,
+                        "error": error,
+                        "data": data}
+            return Response(dataJson)
+        except Exception as e:
+            dataJson = {"status": status,
+                        "error": str(e),
+                        "data": ""}
+            return Response(dataJson)
+
 
     @api_view(["Get"])
     def getExamByCategoryAndName(self,Category,name):
-        # CategoryObject=get_object_or_404(ExamCategory,categoryName=Category)
-        CategoryList = ExamCategory.objects.filter(categoryName=Category)
-        AllExam = Exam.objects.filter(examCategory_id=CategoryList.first().id)
-        examObject={}
-        AllExam = list(AllExam)
-        for exam in AllExam:
-            if exam.name==name:
-                examObject["type"]=exam.type
-                examObject["finalGrade"]=exam.final_grade
-                Questions=serializers.serialize('json',Question.objects.filter(exam_id=exam.id), fields=('question', 'answer_1','answer_2','answer_3',))
-                #Questions=Question.objects.filter(exam_id=exam.id)
-
-                examObject["Questions"]=Questions
-                print(Questions)
         data = []
         error = "No Error"
-        if str(Response.status_code).startswith("5"):
-            error = 'it is the internal server error  ' + Response.status_text
-        elif str(Response.status_code).startswith("4"):
-            error = 'it is the user input  error  ' + Response.status_text
+        dataJson={}
+        status=200
+        try:
+            CategoryList = ExamCategory.objects.filter(categoryName=Category)
+            AllExam = Exam.objects.filter(examCategory_id=CategoryList.first().id)
+
+            AllExam = list(AllExam)
+            flage=0
+            examObject = {}
+            for exam in AllExam:
+                if exam.name==name:
+                    examObject["type"]=exam.type
+                    examObject["finalGrade"]=exam.final_grade
+                    Questions=serializers.serialize('json',Question.objects.filter(exam_id=exam.id), fields=('question', 'answer_1','answer_2','answer_3',))
+                    examObject["Questions"]=Questions
+                    flage=1
+                    print(Questions)
+            if flage==0:
+                Response.status_code = 404
+                raise Exception ("this exam name not found")
 
 
+            if str(Response.status_code).startswith("4"):
+                error = 'it is the user input  error  ' + Response.status_text
 
-        dataJson = {"status": Response.status_code,
-                    "error": error,
-                    "data": examObject}
-        return Response(dataJson )
+            dataJson = {"status": Response.status_code,
+                        "error": error,
+                        "data": examObject}
+            return Response(dataJson )
+        except Exception as e:
+
+            error=str(e)
+            dataJson = {"status": Response.status_code,
+                        "error": error,
+                        "data": ""}
+            return Response(dataJson)
 
