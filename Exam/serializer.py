@@ -19,7 +19,7 @@ class ExamCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class QuestionSerializer(serializers.ModelSerializer):
-    class Mete:
+   class Mete:
         model = Question
         fields = '__all__'
 

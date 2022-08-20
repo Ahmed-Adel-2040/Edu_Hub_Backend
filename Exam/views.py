@@ -68,17 +68,39 @@ class ExamViews():
             AllExam = Exam.objects.filter(examCategory_id=CategoryList.first().id)
 
             AllExam = list(AllExam)
-            flage=0
+            flage = 0
             examObject = {}
             for exam in AllExam:
                 if exam.name==name:
-                    examObject["type"]=exam.type
-                    examObject["finalGrade"]=exam.final_grade
-                    Questions=serializers.serialize('json',Question.objects.filter(exam_id=exam.id), fields=('question', 'answer_1','answer_2','answer_3',))
-                    examObject["Questions"]=Questions
-                    flage=1
-                    print(Questions)
-            if flage==0:
+                    examObject["type"] = exam.type
+                    examObject["finalGrade"] = exam.final_grade
+                    Questions = serializers.serialize('json',Question.objects.filter(exam_id=exam.id), fields=( 'question',))
+                    # if exam.type!="choose":
+
+                    examObject["Questions"] = Questions
+                    Questions = Question.objects.filter(exam_id=exam.id)
+                    Questions=list(Questions)
+                    AllAnswersLists=[]
+
+                    for Quest in Questions:
+                        answerList = []
+                        if exam.type=="choose":
+                            answerList.append(Quest.pk)
+                            answerList.append(Quest.answer_1)
+                            answerList.append(Quest.answer_2)
+                            answerList.append(Quest.answer_3)
+                        else:
+                            answerList.append(Quest.pk)
+                            answerList.append(Quest.answer_1)
+
+                        AllAnswersLists.append(answerList)
+                    examObject["Answers"]=AllAnswersLists
+
+
+                    flage = 1
+
+                    break
+            if flage == 0:
                 Response.status_code = 404
                 raise Exception ("this exam name not found")
 
