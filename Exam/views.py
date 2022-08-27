@@ -2,6 +2,8 @@ from .serializer import *
 from rest_framework.response import Response
 from rest_framework.decorators import  api_view
 from django.core import serializers
+from Exam.ViewModels  import QuestionView
+import json
 
 # Create your views here.
 
@@ -71,34 +73,27 @@ class ExamViews():
             flage = 0
             examObject = {}
             for exam in AllExam:
-                if exam.name==name:
+                if exam.name == name:
                     examObject["type"] = exam.type
                     examObject["finalGrade"] = exam.final_grade
-                    Questions = serializers.serialize('json',Question.objects.filter(exam_id=exam.id), fields=( 'question',))
-                    # if exam.type!="choose":
-
-                    examObject["Questions"] = Questions
                     Questions = Question.objects.filter(exam_id=exam.id)
                     Questions=list(Questions)
-                    AllAnswersLists=[]
-
-                    for Quest in Questions:
+                    AllQuestsLists = []
+                    for quest in Questions:
                         answerList = []
-                        if exam.type=="choose":
-                            answerList.append(Quest.pk)
-                            answerList.append(Quest.answer_1)
-                            answerList.append(Quest.answer_2)
-                            answerList.append(Quest.answer_3)
+                        if exam.type == "choose":
+                            answerList.append(quest.answer_1)
+                            answerList.append(quest.answer_2)
+                            answerList.append(quest.answer_3)
                         else:
-                            answerList.append(Quest.pk)
-                            answerList.append(Quest.answer_1)
+                            answerList.append(quest.answer_1)
 
-                        AllAnswersLists.append(answerList)
-                    examObject["Answers"]=AllAnswersLists
+                        questView =json.dumps( QuestionView(quest.pk,quest.question,answerList),
+                                               default=lambda o: o.__dict__, indent=3)
 
-
+                        AllQuestsLists.append(questView)
+                    examObject["Questions"] = AllQuestsLists
                     flage = 1
-
                     break
             if flage == 0:
                 Response.status_code = 404

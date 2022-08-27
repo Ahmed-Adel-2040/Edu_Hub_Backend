@@ -1,4 +1,5 @@
 from django.db import models
+from djongo import models as arraymodels
 from django.contrib.auth.models import User
 
 # Create your models here.
@@ -28,7 +29,11 @@ class Question (models.Model):
     answer_3 = models.CharField(max_length=200, null=False)
     exam = models.ForeignKey(Exam, related_name='+', null=False, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
-
+    #AllAnswer=arraymodels.ArrayField(
+       # answer_1,
+        #answer_2,
+       # answer_3
+    #)
 class Student (models.Model) :
     student_Account = models.ForeignKey(User,related_name='+',on_delete=models.CASCADE)
     country = models.CharField(max_length=20, null=False)
